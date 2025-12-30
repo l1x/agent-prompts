@@ -1,3 +1,5 @@
+<!--file:execute-epic.md-->
+
 # Execute Epic (Orchestrator)
 
 ## Objective
@@ -8,6 +10,7 @@ Manage the execution of a functional Epic by analyzing the dependency tree and s
 
 - **Epic ID**: The `bd` ticket ID for the Epic (e.g., `bd-e99.1`).
 - **Instruction Source**: `docs/do/execute-task.md` (Content to be injected into worker containers).
+- **Max Concurrency**: `4` (Maximum concurrent Docker containers).
 
 ## Process
 
@@ -69,7 +72,7 @@ docker run \
 
 ## Constraints
 
-- **Concurrency**: Limit to **X** concurrent Docker containers (e.g., 3) to avoid resource exhaustion or API rate limiting.
+- **Concurrency**: Limit to **4** concurrent Docker containers (see Max Concurrency input).
 - **Context Isolation**: Workers must strictly use the `execute-task.md` protocol. They do not share memory; they only coordinate via `bd` ticket statuses.
 - **Safe Failover**: If the orchestrator crashes, it must be able to restart and resume from the current state of the `bd` tickets (stateless orchestration).
 

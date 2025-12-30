@@ -1,13 +1,44 @@
 # Agent prompts
 
-- get started
+Reusable prompts for AI agents, designed to be included as a git submodule.
+
+> [!IMPORTANT]
+> Right now it assumes you are using Rust, Mise and Beads.
+
+## Getting Started
 
 ```bash
 git submodule add https://github.com/l1x/agent-prompts.git .agent-prompts
 ```
 
-- update prompts
+## Updating Prompts
 
 ```bash
 git submodule update --remote
+```
+
+## Required Tooling
+
+These prompts assume the following tools are available in your project:
+
+### mise
+
+[mise](https://mise.jdx.dev/) is a polyglot runtime and task runner. The prompts reference `mise run` commands for common development tasks:
+
+- `mise run task`
+
+Configure tasks in your project's `mise.toml` or `.mise.toml` file.
+
+### beads (bd)
+
+[Beads](https://github.com/beads-project/beads) is a git-native issue tracker for AI-assisted development. It stores tickets as files in your repository, enabling agents to create, update, and track work items.
+
+Key commands used in these prompts:
+
+- `bd quickstart` — Getting the agent onboard
+
+## Agentic Container
+
+```bash
+DOCKER_BUILDKIT=1 docker build --progress=plain --no-cache -t agent-base:0.1.0 -f containers/agent-base.Dockerfile containers/
 ```

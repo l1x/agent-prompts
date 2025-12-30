@@ -8,7 +8,9 @@ Generate a Product Requirements Document (PRD) in Markdown format from a user pr
 
 ## Target Audience
 
-Junior developers (assume strong technical skills but limited domain knowledge; explain concepts clearly, avoid unnecessary jargon).
+Developers (assume strong technical skills but limited domain knowledge, explain concepts clearly, avoid unnecessary jargon)
+Product Managers:
+Technical Project Managers:
 
 ## Process
 
