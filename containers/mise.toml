@@ -12,23 +12,19 @@ GIT_ASKPASS = ""  # Prevent interactive prompts
 GIT_TERMINAL_PROMPT = "0"
 
 # tasks
-[tasks.git]
-description = "One-time config to tell git to use gh for auth"
-# This connects standard 'git clone' to the 'gh' CLI's auth
-run = "git config --global credential.helper '!gh auth git-credential'"
-
 [tasks.repo]
 description = "Clone the repository"
-depends = ["git"]
 # Clean command, no auth scripts needed thanks to the credential helper
-run = "git clone --local /host-repo /workspace"
+run = "git clone --no-hardlinks /host-repo workspace"
 
-[tasks.branch]
-description = "Create and checkout the feature branch"
+[tasks.git]
+description = "Configuring git"
+# This connects standard 'git clone' to the 'gh' CLI's auth
+dir = "workspace"
 depends = ["repo"]
-dir = "/workspace"
-# Uses the TARGET_TICKET_ID verified in [env]
 run = """
+git config --global credential.helper '!gh auth git-credential'
+git remote set-url origin https://github.com/l1x/agent-prompts.git
 git fetch origin main
 git checkout -b "agent/${TARGET_TICKET_ID}" origin/main
 """
@@ -36,7 +32,7 @@ git checkout -b "agent/${TARGET_TICKET_ID}" origin/main
 [tasks.agent]
 description = "Run the agent"
 depends = ["branch"]
-dir = "/workspace"
+dir = "workspace"
 run = """
-claude --param1 --param2
+echo 'agent-run'
 """

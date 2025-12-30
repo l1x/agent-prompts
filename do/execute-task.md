@@ -16,8 +16,6 @@ Implement a single, atomic task defined in a Beads ticket, ensuring code quality
    - cd /home/agent
    - mise trust
    - mise git
-   - mise repo
-   - mise branch
    - mise agent
 
 1. **Claim Task**
