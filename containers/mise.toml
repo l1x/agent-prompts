@@ -19,7 +19,7 @@ run = "git config --global credential.helper '!gh auth git-credential'"
 
 [tasks.repo]
 description = "Clone the repository"
-depends = ["configure-git"]
+depends = ["git"]
 # Clean command, no auth scripts needed thanks to the credential helper
 run = "git clone --local /host-repo /workspace"
 
@@ -38,5 +38,5 @@ description = "Run the agent"
 depends = ["branch"]
 dir = "/workspace"
 run = """
-mise run agent
+claude --param1 --param2
 """

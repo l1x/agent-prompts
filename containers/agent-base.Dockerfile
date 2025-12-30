@@ -21,8 +21,25 @@ RUN echo -n "current user:" && whoami && \
 # mise
 RUN mkdir -p /home/agent/.config/mise/ && \
   mkdir -p bin/ && curl https://mise.run | MISE_DEBUG=1 MISE_INSTALL_PATH=/home/agent/bin/mise sh
+RUN curl -sSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash || echo 'ok'
+RUN mv /home/agent/.local/bin/bd /home/agent/bin/bd
+
+# Config files
+
 COPY --chown=agent:agent mise.config.toml /home/agent/.config/mise/config.toml
+COPY --chown=agent:agent mise.toml /home/agent/mise.toml
+
+# Env
+
 ENV PATH="/home/agent/bin:$PATH"
+
+# Mise tasks
+
 RUN echo 'eval "$(mise activate bash)"' >> ~/.bashrc
+RUN mise activate | bash
+RUN mise trust
 RUN mise install
 RUN rustc --version
+RUN cargo --version
+RUN mise --version
+RUN bd --version

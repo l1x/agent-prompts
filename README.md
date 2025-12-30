@@ -42,3 +42,26 @@ Key commands used in these prompts:
 ```bash
 DOCKER_BUILDKIT=1 docker build --progress=plain --no-cache -t agent-base:0.1.0 -f containers/agent-base.Dockerfile containers/
 ```
+
+## Architecture Summary
+
+```
+ ┌─────────────────────────────────────────────────────────┐
+ │  Orchestrator (Claude Code on host)                     │
+ │  - Runs: bd ready                                       │
+ │  - Spawns: up to 4 containers                           │
+ │  - Monitors: docker logs, bd status                     │
+ └─────────────────────────┬───────────────────────────────┘
+                           │
+         ┌─────────────────┼─────────────────┐
+         ▼                 ▼                 ▼
+ ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+ │ Container 1  │  │ Container 2  │  │ Container 3  │
+ │ ticket-abc   │  │ ticket-def   │  │ ticket-ghi   │
+ │              │  │              │  │              │
+ │ mise run:    │  │ mise run:    │  │ mise run:    │
+ │  git→repo→   │  │  git→repo→   │  │  git→repo→   │
+ │  branch→     │  │  branch→     │  │  branch→     │
+ │  agent       │  │  agent       │  │  agent       │
+ └──────────────┘  └──────────────┘  └──────────────┘
+```

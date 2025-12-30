@@ -13,12 +13,16 @@ Implement a single, atomic task defined in a Beads ticket, ensuring code quality
 ## Process
 
 1. **Setup env**
+   - cd /home/agent
+   - mise trust
    - mise git
    - mise repo
    - mise branch
    - mise agent
 
 1. **Claim Task**
+   - cd /home/agent/workspace
+   - mise trust
    - Read the task details: `bd show <id>`
    - Mark the task as in progress: `bd update <id> --status=in_progress`
    - run `bd sync`

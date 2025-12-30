@@ -49,7 +49,7 @@ Manage the execution of a functional Epic by analyzing the dependency tree and s
 docker run \
   --rm \
   --name "agent-<ticket_id>" \
-  -v $(pwd):/app \
+  -v $(pwd):/repo \
   -w /app \
   -e BEADS_API_KEY=$BEADS_API_KEY \
   -e TARGET_TICKET_ID="<ticket_id>" \
