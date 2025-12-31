@@ -49,14 +49,13 @@ docker-agent/
 ├── src/
 │   ├── main.rs           # Entry point, CLI args, logging setup
 │   ├── docker_manager.rs # Docker container lifecycle management
+│   ├── mcp_server.rs     # MCP protocol (JSON-RPC over stdio)
 │   └── tools.rs          # MCP tool definitions (serde structs)
 ├── Cargo.toml            # Project configuration and dependencies
-├── Cargo.lock            # Locked dependency versions (not committed for binary)
+├── Cargo.lock            # Locked dependency versions
 ├── .gitignore            # Standard Rust ignore patterns
 └── README.md             # Project documentation
 ```
-
-**Note**: `Cargo.lock` is not committed as this is a binary crate (see `.gitignore` line 5-6).
 
 ### Module Responsibilities
 
@@ -64,6 +63,10 @@ docker-agent/
 - **docker_manager.rs**: Core Docker operations using `bollard` (Docker HTTP API client)
   - Manages container state in memory using `Arc<RwLock<HashMap>>`
   - Handles container lifecycle: start, stop, logs, exec, list
+- **mcp_server.rs**: MCP protocol implementation
+  - JSON-RPC 2.0 over stdio
+  - Handles `initialize`, `tools/list`, `tools/call` requests
+  - Routes tool calls to DockerManager methods
 - **tools.rs**: MCP protocol tool definitions
   - Uses `serde` for JSON serialization/deserialization
   - Defines input/output structures for each Docker tool
@@ -196,48 +199,26 @@ The server exposes these tools via MCP protocol:
 
 ## Current Implementation Status
 
-The project structure is in place but core Docker operations are not yet implemented:
+The MCP server infrastructure is complete. The code compiles successfully.
 
-- `docker_manager.rs` has stub methods with `todo!()` for:
-  - `start_container()`
-  - `get_logs()`
-  - `exec_command()`
-  - `stop_container()`
-  - `list_containers()`
-  - `get_container()`
+**Implemented:**
+- `mcp_server.rs` - Full MCP protocol with JSON-RPC 2.0
+  - `initialize` - Server handshake
+  - `tools/list` - Tool discovery with JSON schemas
+  - `tools/call` - Tool execution routing
+  - `ping` - Health check
 
-- `main.rs` references `mcp_server::run()` but `src/mcp_server.rs` does not exist yet
-
-### Compilation Errors
-
-The codebase currently has compilation errors that must be resolved before the server can run:
-
-1. **Missing module**: `src/main.rs:7` - `mod mcp_server;` references non-existent file
-   - Fix: Create `src/mcp_server.rs` or `src/mcp_server/mod.rs`
-
-2. **EnvFilter type mismatch**: `src/main.rs:33` - `format!()` returns `String`, but needs `EnvFilter`
-   - Fix: Add `.into()` conversion: `format!("docker-agent={}", args.log_level).into()`
-
-3. **Argh docstring capitalization**: `src/main.rs:16` and `:20` - Docstrings must start with lowercase
-   - Fix: Change `/// Docker socket path` to `/// docker socket path`
+**Stub implementations** (`docker_manager.rs` - will panic with `todo!()`):
+- `start_container()` - Start long-running container
+- `get_logs()` - Fetch container logs (incremental)
+- `exec_command()` - Execute one-off command
+- `stop_container()` - Stop and remove container
+- `list_containers()` - List tracked containers
+- `get_container()` - Get container by ID
 
 ### Linter Warnings
 
-Clippy reports 7 warnings about unused variables in stub functions:
-
-```
-warning: unused variable: `config`
-warning: unused variable: `query`
-warning: unused variable: `container_id` (multiple)
-warning: unused variable: `command`
-```
-
-These are expected for stub implementations with `todo!()`. To suppress, prefix with underscore:
-```rust
-pub async fn start_container(&self, _config: StartConfig) -> Result<String, DockerError> {
-    todo!()
-}
-```
+Clippy reports warnings about unused fields/variants in stub code. These are expected and will resolve when Docker operations are implemented.
 
 ## Code Style
 
@@ -277,27 +258,17 @@ The server communicates via JSON-RPC over stdio.
 ## Common Gotchas
 
 1. **Argh docstring capitalization**: Argh requires `/// docker socket path` not `/// Docker socket path`
-2. **EnvFilter type**: `tracing_subscriber::EnvFilter::try_from_default_env()` returns `Result`, not `EnvFilter` directly. When providing a default, need `.into()` conversion: `format!("docker-agent={}", args.log_level).into()`
+2. **EnvFilter type**: When providing a default filter, use `.into()`: `format!("docker-agent={}", level).into()`
 3. **Serde enum with tag/content**: MCP tools use `#[serde(tag = "name", content = "arguments")]` pattern
 4. **Time crate version**: Using `time` 0.3, not the newer 0.4
-5. **Missing mcp_server module**: The main.rs references a module that doesn't exist yet
-6. **Clippy unused variable warnings**: Functions with `todo!()` implementations will trigger unused variable warnings. Prefix with underscore if intentional: `_config`, `_container_id`, etc.
+5. **Clippy unused variable warnings**: Functions with `todo!()` trigger warnings. Prefix with underscore: `_config`
 
 ## Development Workflow
 
 1. Make changes to source files
 2. Run `cargo check` to verify compilation
 3. Run `cargo clippy` to catch common issues
-   - Note: Stub functions with `todo!()` will generate unused variable warnings
-   - Prefix with underscore (`_`) to suppress: `_config`, `_container_id`, etc.
 4. Run `cargo fmt` to format code
-   - Note: `cargo fmt` will fail if the code doesn't compile
 5. Run `cargo test` to verify tests (once added)
-6. Build and run locally with `cargo run -- --socket /var/run/docker.sock --log-level debug`
+6. Build and run locally with `cargo run -- --log-level debug`
 7. Test MCP tools by connecting from Claude Desktop
-
-### Linting Notes
-
-- **cargo fmt**: Requires code to compile successfully before running
-- **cargo clippy**: Reports 7 warnings for unused variables in stub functions (expected)
-- Use `#[allow(unused_variables)]` or underscore prefixes for intentional unused variables

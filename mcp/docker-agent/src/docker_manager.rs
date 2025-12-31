@@ -4,8 +4,8 @@ use bollard::Docker;
 use std::collections::HashMap;
 use std::sync::Arc;
 use thiserror::Error;
-use tokio::sync::RwLock;
 use time::OffsetDateTime;
+use tokio::sync::RwLock;
 
 /// Errors that can occur during Docker operations
 #[derive(Debug, Error)]
@@ -43,7 +43,7 @@ pub struct ContainerState {
 pub enum ContainerStatus {
     Running,
     Stopped,
-    Exited(i32),  // Exit code
+    Exited(i32), // Exit code
     Error(String),
 }
 
@@ -52,7 +52,7 @@ pub struct StartConfig {
     pub image: String,
     pub command: Option<Vec<String>>,
     pub env_vars: Vec<String>,
-    pub volume_mounts: Vec<(String, String)>,  // (host_path, container_path)
+    pub volume_mounts: Vec<(String, String)>, // (host_path, container_path)
     pub name: Option<String>,
 }
 
@@ -83,36 +83,36 @@ impl DockerManager {
     }
 
     /// Start a long-running container
-    pub async fn start_container(&self, config: StartConfig) -> Result<String, DockerError> {
-        todo!()
+    pub async fn start_container(&self, _config: StartConfig) -> Result<String, DockerError> {
+        todo!("Implement container start")
     }
 
     /// Fetch logs from container (can be called repeatedly)
-    pub async fn get_logs(&self, query: LogQuery) -> Result<LogsOutput, DockerError> {
-        todo!()
+    pub async fn get_logs(&self, _query: LogQuery) -> Result<LogsOutput, DockerError> {
+        todo!("Implement log fetching")
     }
 
     /// Execute one-off command in container
     pub async fn exec_command(
         &self,
-        container_id: &str,
-        command: &str,
+        _container_id: &str,
+        _command: &str,
     ) -> Result<String, DockerError> {
-        todo!()
+        todo!("Implement exec")
     }
 
     /// Stop and remove container
-    pub async fn stop_container(&self, container_id: &str) -> Result<(), DockerError> {
-        todo!()
+    pub async fn stop_container(&self, _container_id: &str) -> Result<(), DockerError> {
+        todo!("Implement container stop")
     }
 
     /// List all tracked containers
     pub fn list_containers(&self) -> Vec<ContainerState> {
-        todo!()
+        todo!("Implement list")
     }
 
     /// Get container state by ID
-    pub fn get_container(&self, container_id: &str) -> Option<ContainerState> {
-        todo!()
+    pub fn get_container(&self, _container_id: &str) -> Option<ContainerState> {
+        todo!("Implement get")
     }
 }
