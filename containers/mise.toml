@@ -31,7 +31,6 @@ git checkout -b "agent/${TARGET_TICKET_ID}" origin/main
 
 [tasks.agent]
 description = "Run the agent"
-depends = ["branch"]
 dir = "workspace"
 run = """
 echo 'agent-run'
