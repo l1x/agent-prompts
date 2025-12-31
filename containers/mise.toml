@@ -24,7 +24,8 @@ dir = "workspace"
 depends = ["repo"]
 run = """
 git config --global credential.helper '!gh auth git-credential'
-git remote set-url origin https://github.com/l1x/agent-prompts.git
+git remote set-url origin https://github.com/l1x/agent-prompts
+gh auth login --with-token <<< "$GITHUB_TOKEN"
 git fetch origin main
 git checkout -b "agent/${TARGET_TICKET_ID}" origin/main
 """

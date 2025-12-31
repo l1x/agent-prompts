@@ -21,6 +21,8 @@ Implement a single, atomic task defined in a Beads ticket, ensuring code quality
 1. **Claim Task**
    - cd /home/agent/workspace
    - mise trust
+   - bd init
+   - git push -u origin BRANCH_NAME
    - Read the task details: `bd show <id>`
    - Mark the task as in progress: `bd update <id> --status=in_progress`
    - run `bd sync`
