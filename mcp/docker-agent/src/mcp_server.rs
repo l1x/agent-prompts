@@ -12,34 +12,35 @@ use serde_json::{Value, json};
 use std::io::{self, BufRead, Write};
 
 /// JSON-RPC 2.0 request
-#[derive(Debug, Deserialize)]
-struct JsonRpcRequest {
-    jsonrpc: String,
-    id: Option<Value>,
-    method: String,
+#[derive(Debug, Clone, Deserialize)]
+#[cfg_attr(test, derive(Serialize))]
+pub struct JsonRpcRequest {
+    pub jsonrpc: String,
+    pub id: Option<Value>,
+    pub method: String,
     #[serde(default)]
-    params: Value,
+    pub params: Value,
 }
 
 /// JSON-RPC 2.0 response
-#[derive(Debug, Serialize)]
-struct JsonRpcResponse {
-    jsonrpc: &'static str,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsonRpcResponse {
+    pub jsonrpc: &'static str,
     #[serde(skip_serializing_if = "Option::is_none")]
-    id: Option<Value>,
+    pub id: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    result: Option<Value>,
+    pub result: Option<Value>,
     #[serde(skip_serializing_if = "Option::is_none")]
-    error: Option<JsonRpcError>,
+    pub error: Option<JsonRpcError>,
 }
 
 /// JSON-RPC 2.0 error
-#[derive(Debug, Serialize)]
-struct JsonRpcError {
-    code: i32,
-    message: String,
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct JsonRpcError {
+    pub code: i32,
+    pub message: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    data: Option<Value>,
+    pub data: Option<Value>,
 }
 
 impl JsonRpcResponse {
@@ -115,7 +116,7 @@ async fn handle_request(manager: &DockerManager, request: JsonRpcRequest) -> Jso
 }
 
 /// Handle initialize request
-fn handle_initialize(id: Option<Value>) -> JsonRpcResponse {
+pub fn handle_initialize(id: Option<Value>) -> JsonRpcResponse {
     JsonRpcResponse::success(
         id,
         json!({
@@ -132,7 +133,7 @@ fn handle_initialize(id: Option<Value>) -> JsonRpcResponse {
 }
 
 /// Handle tools/list request
-fn handle_tools_list(id: Option<Value>) -> JsonRpcResponse {
+pub fn handle_tools_list(id: Option<Value>) -> JsonRpcResponse {
     let tools = vec![
         McpTool {
             name: "docker_run",
@@ -361,4 +362,164 @@ async fn handle_docker_list(manager: &DockerManager) -> Result<String, String> {
         .collect();
 
     serde_json::to_string(&json!({ "containers": list })).map_err(|e| e.to_string())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use serde_json::json;
+
+    #[test]
+    fn test_json_rpc_response_success() {
+        let response = JsonRpcResponse::success(Some(json!(1)), json!({"result": "ok"}));
+
+        assert_eq!(response.jsonrpc, "2.0");
+        assert_eq!(response.id, Some(json!(1)));
+        assert_eq!(response.result, Some(json!({"result": "ok"})));
+        assert!(response.error.is_none());
+    }
+
+    #[test]
+    fn test_json_rpc_response_error() {
+        let response = JsonRpcResponse::error(Some(json!(2)), -32600, "Invalid Request");
+
+        assert_eq!(response.jsonrpc, "2.0");
+        assert_eq!(response.id, Some(json!(2)));
+        assert!(response.result.is_none());
+
+        let error = response.error.unwrap();
+        assert_eq!(error.code, -32600);
+        assert_eq!(error.message, "Invalid Request");
+    }
+
+    #[test]
+    fn test_json_rpc_request_parse() {
+        let json_str = r#"{"jsonrpc":"2.0","id":1,"method":"initialize","params":{}}"#;
+        let request: JsonRpcRequest = serde_json::from_str(json_str).unwrap();
+
+        assert_eq!(request.jsonrpc, "2.0");
+        assert_eq!(request.id, Some(json!(1)));
+        assert_eq!(request.method, "initialize");
+    }
+
+    #[test]
+    fn test_json_rpc_request_parse_no_params() {
+        let json_str = r#"{"jsonrpc":"2.0","id":1,"method":"ping"}"#;
+        let request: JsonRpcRequest = serde_json::from_str(json_str).unwrap();
+
+        assert_eq!(request.method, "ping");
+        assert_eq!(request.params, Value::Null);
+    }
+
+    #[test]
+    fn test_json_rpc_request_parse_string_id() {
+        let json_str = r#"{"jsonrpc":"2.0","id":"request-1","method":"tools/list"}"#;
+        let request: JsonRpcRequest = serde_json::from_str(json_str).unwrap();
+
+        assert_eq!(request.id, Some(json!("request-1")));
+        assert_eq!(request.method, "tools/list");
+    }
+
+    #[test]
+    fn test_handle_initialize() {
+        let response = handle_initialize(Some(json!(1)));
+
+        assert_eq!(response.jsonrpc, "2.0");
+        assert_eq!(response.id, Some(json!(1)));
+        assert!(response.error.is_none());
+
+        let result = response.result.unwrap();
+        assert_eq!(result["protocolVersion"], "2024-11-05");
+        assert!(result["capabilities"]["tools"].is_object());
+        assert_eq!(result["serverInfo"]["name"], "docker-agent");
+    }
+
+    #[test]
+    fn test_handle_initialize_null_id() {
+        let response = handle_initialize(None);
+
+        assert!(response.id.is_none());
+        assert!(response.result.is_some());
+    }
+
+    #[test]
+    fn test_handle_tools_list() {
+        let response = handle_tools_list(Some(json!(2)));
+
+        assert_eq!(response.jsonrpc, "2.0");
+        assert_eq!(response.id, Some(json!(2)));
+        assert!(response.error.is_none());
+
+        let result = response.result.unwrap();
+        let tools = result["tools"].as_array().unwrap();
+
+        // Should have 5 tools
+        assert_eq!(tools.len(), 5);
+
+        // Check tool names
+        let tool_names: Vec<&str> = tools.iter().map(|t| t["name"].as_str().unwrap()).collect();
+        assert!(tool_names.contains(&"docker_run"));
+        assert!(tool_names.contains(&"docker_logs"));
+        assert!(tool_names.contains(&"docker_exec"));
+        assert!(tool_names.contains(&"docker_stop"));
+        assert!(tool_names.contains(&"docker_list"));
+    }
+
+    #[test]
+    fn test_handle_tools_list_schema_structure() {
+        let response = handle_tools_list(Some(json!(1)));
+        let result = response.result.unwrap();
+        let tools = result["tools"].as_array().unwrap();
+
+        // Find docker_run tool
+        let docker_run = tools.iter().find(|t| t["name"] == "docker_run").unwrap();
+
+        // Check schema structure
+        assert!(docker_run.get("description").is_some());
+        assert!(docker_run.get("inputSchema").is_some());
+
+        let schema = &docker_run["inputSchema"];
+        assert_eq!(schema["type"], "object");
+        assert!(schema["properties"]["image"].is_object());
+        assert_eq!(schema["required"], json!(["image"]));
+    }
+
+    #[test]
+    fn test_json_rpc_response_serialization() {
+        let response = JsonRpcResponse::success(Some(json!(1)), json!({"status": "ok"}));
+        let json_str = serde_json::to_string(&response).unwrap();
+
+        // Parse back and verify
+        let parsed: Value = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(parsed["jsonrpc"], "2.0");
+        assert_eq!(parsed["id"], 1);
+        assert_eq!(parsed["result"]["status"], "ok");
+        // error should not be present (skip_serializing_if)
+        assert!(parsed.get("error").is_none());
+    }
+
+    #[test]
+    fn test_json_rpc_error_serialization() {
+        let response = JsonRpcResponse::error(Some(json!(1)), -32601, "Method not found");
+        let json_str = serde_json::to_string(&response).unwrap();
+
+        let parsed: Value = serde_json::from_str(&json_str).unwrap();
+        assert_eq!(parsed["error"]["code"], -32601);
+        assert_eq!(parsed["error"]["message"], "Method not found");
+        // result should not be present
+        assert!(parsed.get("result").is_none());
+    }
+
+    #[test]
+    fn test_parse_invalid_json() {
+        let result = serde_json::from_str::<JsonRpcRequest>("not valid json");
+        assert!(result.is_err());
+    }
+
+    #[test]
+    fn test_parse_missing_required_fields() {
+        // Missing method field
+        let result = serde_json::from_str::<JsonRpcRequest>(r#"{"jsonrpc":"2.0","id":1}"#);
+        assert!(result.is_err());
+    }
 }
