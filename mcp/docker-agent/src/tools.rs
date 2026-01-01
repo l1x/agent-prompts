@@ -5,6 +5,7 @@ use serde::{Deserialize, Serialize};
 /// Available Docker tools
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(tag = "name", content = "arguments")]
+#[allow(dead_code, clippy::enum_variant_names)] // Will be used for typed tool dispatch
 pub enum DockerTool {
     /// Start a new long-running container
     #[serde(rename = "docker_run")]
@@ -36,10 +37,10 @@ pub struct DockerRunArgs {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub command: Option<Vec<String>>,
     /// Environment variables (e.g., ["KEY=value"])
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub env_vars: Vec<String>,
     /// Volume mounts (host_path:container_path)
-    #[serde(skip_serializing_if = "Vec::is_empty")]
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub volume_mounts: Vec<String>,
     /// Container name (optional, auto-generated if not provided)
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -163,6 +164,21 @@ mod tests {
         assert_eq!(args.env_vars, vec!["REDIS_PORT=6379"]);
         assert_eq!(args.volume_mounts, vec!["/data:/data"]);
         assert_eq!(args.name, Some("my-redis".to_string()));
+    }
+
+    #[test]
+    fn test_docker_run_args_deserialize_minimal() {
+        // This should work with only the required "image" field
+        let json = json!({
+            "image": "ubuntu:latest"
+        });
+
+        let args: DockerRunArgs = serde_json::from_value(json).unwrap();
+        assert_eq!(args.image, "ubuntu:latest");
+        assert!(args.command.is_none());
+        assert!(args.env_vars.is_empty());
+        assert!(args.volume_mounts.is_empty());
+        assert!(args.name.is_none());
     }
 
     #[test]

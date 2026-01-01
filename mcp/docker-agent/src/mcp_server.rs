@@ -15,6 +15,7 @@ use std::io::{self, BufRead, Write};
 #[derive(Debug, Clone, Deserialize)]
 #[cfg_attr(test, derive(Serialize))]
 pub struct JsonRpcRequest {
+    #[allow(dead_code)] // Required by JSON-RPC spec but we don't validate the version
     pub jsonrpc: String,
     pub id: Option<Value>,
     pub method: String,
@@ -44,7 +45,7 @@ pub struct JsonRpcError {
 }
 
 impl JsonRpcResponse {
-    fn success(id: Option<Value>, result: Value) -> Self {
+    pub fn success(id: Option<Value>, result: Value) -> Self {
         Self {
             jsonrpc: "2.0",
             id,
@@ -53,7 +54,7 @@ impl JsonRpcResponse {
         }
     }
 
-    fn error(id: Option<Value>, code: i32, message: impl Into<String>) -> Self {
+    pub fn error(id: Option<Value>, code: i32, message: impl Into<String>) -> Self {
         Self {
             jsonrpc: "2.0",
             id,
@@ -89,9 +90,14 @@ pub async fn run(manager: DockerManager) -> Result<(), Box<dyn std::error::Error
             continue;
         }
 
+        tracing::info!(request = %line, "Received JSON-RPC request");
+
         let response = match serde_json::from_str::<JsonRpcRequest>(&line) {
             Ok(request) => handle_request(&manager, request).await,
-            Err(e) => JsonRpcResponse::error(None, -32700, format!("Parse error: {}", e)),
+            Err(e) => {
+                tracing::error!(error = %e, raw_request = %line, "Failed to parse JSON-RPC request");
+                JsonRpcResponse::error(None, -32700, format!("Parse error: {}", e))
+            }
         };
 
         let output = serde_json::to_string(&response)?;
@@ -104,7 +110,7 @@ pub async fn run(manager: DockerManager) -> Result<(), Box<dyn std::error::Error
 
 /// Handle a single JSON-RPC request
 async fn handle_request(manager: &DockerManager, request: JsonRpcRequest) -> JsonRpcResponse {
-    tracing::debug!("Handling request: {}", request.method);
+    tracing::info!(method = %request.method, id = ?request.id, "Processing request");
 
     match request.method.as_str() {
         "initialize" => handle_initialize(request.id),
@@ -210,6 +216,8 @@ async fn handle_tools_call(
     let tool_name = params.get("name").and_then(|v| v.as_str()).unwrap_or("");
     let arguments = params.get("arguments").cloned().unwrap_or(json!({}));
 
+    tracing::info!(tool = %tool_name, arguments = %arguments, "Executing tool");
+
     let result = match tool_name {
         "docker_run" => handle_docker_run(manager, arguments).await,
         "docker_logs" => handle_docker_logs(manager, arguments).await,
@@ -220,25 +228,31 @@ async fn handle_tools_call(
     };
 
     match result {
-        Ok(content) => JsonRpcResponse::success(
-            id,
-            json!({
-                "content": [{
-                    "type": "text",
-                    "text": content
-                }]
-            }),
-        ),
-        Err(e) => JsonRpcResponse::success(
-            id,
-            json!({
-                "content": [{
-                    "type": "text",
-                    "text": format!("Error: {}", e)
-                }],
-                "isError": true
-            }),
-        ),
+        Ok(content) => {
+            tracing::info!(tool = %tool_name, "Tool execution succeeded");
+            JsonRpcResponse::success(
+                id,
+                json!({
+                    "content": [{
+                        "type": "text",
+                        "text": content
+                    }]
+                }),
+            )
+        }
+        Err(e) => {
+            tracing::error!(tool = %tool_name, error = %e, "Tool execution failed");
+            JsonRpcResponse::success(
+                id,
+                json!({
+                    "content": [{
+                        "type": "text",
+                        "text": format!("Error: {}", e)
+                    }],
+                    "isError": true
+                }),
+            )
+        }
     }
 }
 
@@ -341,7 +355,7 @@ async fn handle_docker_stop(manager: &DockerManager, args: Value) -> Result<Stri
 }
 
 async fn handle_docker_list(manager: &DockerManager) -> Result<String, String> {
-    let containers = manager.list_containers();
+    let containers = manager.list_containers().await;
 
     let list: Vec<Value> = containers
         .iter()
