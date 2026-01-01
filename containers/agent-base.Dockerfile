@@ -24,17 +24,13 @@ RUN mkdir -p /home/agent/.config/mise/ && \
 RUN curl -sSL https://raw.githubusercontent.com/steveyegge/beads/main/scripts/install.sh | bash || echo 'ok'
 RUN mv /home/agent/.local/bin/bd /home/agent/bin/bd
 
-# Config files
-
+# mise config
 COPY --chown=agent:agent mise.config.toml /home/agent/.config/mise/config.toml
-COPY --chown=agent:agent mise.toml /home/agent/mise.toml
 
-# Env
-
+# env
 ENV PATH="/home/agent/bin:$PATH"
 
-# Mise tasks
-
+# mise tasks
 RUN echo 'eval "$(mise activate bash)"' >> ~/.bashrc
 RUN mise activate | bash
 RUN mise trust
@@ -43,3 +39,6 @@ RUN rustc --version
 RUN cargo --version
 RUN mise --version
 RUN bd --version
+
+# mise commands for runtime
+COPY --chown=agent:agent mise.toml /home/agent/mise.toml

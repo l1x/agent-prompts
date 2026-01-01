@@ -23,12 +23,17 @@ description = "Configuring git"
 dir = "workspace"
 depends = ["repo"]
 run = """
-git config --global credential.helper '!gh auth git-credential'
 git remote set-url origin https://github.com/l1x/agent-prompts
-gh auth login --with-token <<< "$GITHUB_TOKEN"
+git config --global credential.helper '!gh auth git-credential'
 git fetch origin main
 git checkout -b "agent/${TARGET_TICKET_ID}" origin/main
+bd init --prefix agent
 """
+
+[tasks.task-list]
+description = "Listing tasks"
+dir = "workspace"
+run = "bd list"
 
 [tasks.agent]
 description = "Run the agent"

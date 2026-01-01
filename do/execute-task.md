@@ -10,6 +10,11 @@ Implement a single, atomic task defined in a Beads ticket, ensuring code quality
 
 - **Ticket ID**: The `bd` ticket ID to execute (e.g., `bd-a3f8.1`).
 
+## Tools
+
+- use mise when feasible
+- use bd for tasks management
+
 ## Process
 
 1. **Setup env**
@@ -31,6 +36,7 @@ Implement a single, atomic task defined in a Beads ticket, ensuring code quality
    - Read the parent Epic or PRD if referenced to understand the broader scope.
    - Explore relevant source code sections.
    - Ignore compiled or otherwise generated content.
+   - Update the task description with a short summary and
 
 1. **Implementation**
    - **Create Test**: Write a failing test case that reproduces the requirement or bug.
