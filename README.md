@@ -1,74 +1,64 @@
-# Agent prompts
+# Agent Prompts
 
-Reusable prompts for AI agents, designed to be included as a git submodule.
+Reusable prompts for AI coding agents, designed to be included as a git submodule.
 
-> [!IMPORTANT]
-> Right now it assumes you are using Rust, Mise and Beads.
+> [!NOTE]
+> This framework assumes Rust, Mise, and Beads. The principles apply broadly, but the prompts reference these tools directly.
 
-## Getting Started
+## The Problem
 
-```bash
-git submodule add https://github.com/l1x/agent-prompts.git .agent-prompts
+AI coding agents fail in predictable ways:
+
+| Failure Mode | Cause | Symptom |
+|--------------|-------|---------|
+| **Attention drift** | Large context windows | Agent "forgets" earlier instructions, hallucinates file paths |
+| **Scope creep** | No explicit boundaries | Simple bug fix becomes architectural refactor |
+| **Context exhaustion** | Dumping entire codebase | Token limits hit mid-task, work lost |
+| **Coordination chaos** | No persistent state | Multi-session work loses continuity |
+
+The root cause: **agents need structure, not just capability**.
+
+## The Solution
+
+This framework addresses each failure mode:
+
+### 1. Attention-Directing Prompts
+
+Instead of dumping files into context, we curate precisely what the agent needs:
+
+```xml
+<files>
+  <file path="src/main.rs" mode="full"/>        <!-- Editing this -->
+  <file path="src/lib.rs" mode="codemap"/>      <!-- Reference only -->
+  <file path="src/utils.rs" mode="slice" lines="45-80"/>  <!-- Just this function -->
+</files>
 ```
 
-## Updating Prompts
+| Mode | Tokens | Use Case |
+|------|--------|----------|
+| `full` | 100% | Files being edited |
+| `codemap` | ~10% | Signatures, types, interfaces |
+| `slice` | Variable | Specific line ranges |
 
-```bash
-git submodule update --remote
-```
+### 2. Agentic Project Management
 
-## Required Tooling
+Work is tracked in git-native tickets (Beads), enabling:
 
-These prompts assume the following tools are available in your project:
+- **Dependency graphs** — Agents know what's ready via `bd ready`
+- **Status tracking** — `open → in_progress → blocked → closed`
+- **Context persistence** — Tickets survive session boundaries and compaction
 
-### mise
+### 3. Human-in-the-Loop Gates
 
-[mise](https://mise.jdx.dev/) is a polyglot runtime and task runner. The prompts reference `mise run` commands for common development tasks:
-
-- `mise run task`
-
-Configure tasks in your project's `mise.toml` or `.mise.toml` file.
-
-### beads (bd)
-
-[Beads](https://github.com/beads-project/beads) is a git-native issue tracker for AI-assisted development. It stores tickets as files in your repository, enabling agents to create, update, and track work items.
-
-Key commands used in these prompts:
-
-- `bd quickstart` — Getting the agent onboard
-
-## Agentic Container
-
-```bash
-DOCKER_BUILDKIT=1 docker build --progress=plain --no-cache -t agent-base:0.1.0 -f containers/agent-base.Dockerfile containers/
-```
-
-## Architecture Summary
+Agents don't push to main. The workflow enforces review:
 
 ```
- ┌─────────────────────────────────────────────────────────┐
- │  Orchestrator (Claude Code on host)                     │
- │  - Runs: bd ready                                       │
- │  - Spawns: up to 4 containers                           │
- │  - Monitors: docker logs, bd status                     │
- └─────────────────────────┬───────────────────────────────┘
-                           │
-         ┌─────────────────┼─────────────────┐
-         ▼                 ▼                 ▼
- ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
- │ Container 1  │  │ Container 2  │  │ Container 3  │
- │ ticket-abc   │  │ ticket-def   │  │ ticket-ghi   │
- │              │  │              │  │              │
- │ mise run:    │  │ mise run:    │  │ mise run:    │
- │  git→repo→   │  │  git→repo→   │  │  git→repo→   │
- │  branch→     │  │  branch→     │  │  branch→     │
- │  agent       │  │  agent       │  │  agent       │
- └──────────────┘  └──────────────┘  └──────────────┘
+Agent completes → Status: blocked → Human reviews → Merged or feedback
 ```
 
-## Workflow
+## How It Works
 
-The development workflow follows a structured pipeline from feature request to merged code:
+### Development Pipeline
 
 ```mermaid
 flowchart TD
@@ -133,8 +123,6 @@ flowchart LR
 
 ### Execution Modes
 
-Tasks can be executed automatically or with human intervention:
-
 ```mermaid
 flowchart TD
     T[Task Ready] --> A{Automatic?}
@@ -150,3 +138,67 @@ flowchart TD
     W --> H
     B --> R[Ready for Review]
 ```
+
+## Tooling Philosophy: Shift Left
+
+These tools catch problems before agents encounter them:
+
+### Rust
+
+- **Compile-time safety** — Type errors caught before runtime, reducing agent debugging loops
+- **Self-documenting types** — Agents reason about `Result<User, AuthError>` better than `any`
+- **Predictable builds** — `cargo build` either works or gives actionable errors
+
+### Mise
+
+- **Declarative tasks** — `mise run test` behaves identically everywhere
+- **Reproducible environments** — Tool versions pinned, no "works on my machine"
+- **Composable workflows** — Tasks chain predictably: `fmt → lint → test → build`
+
+### Beads
+
+- **Git-native tickets** — Issues stored as files, travel with the code
+- **Dependency graphs** — `bd ready` returns only unblocked work
+- **Session resilience** — Context survives compaction, agents resume cleanly
+
+## Getting Started
+
+### Installation
+
+```bash
+# Add as submodule
+git submodule add https://github.com/l1x/agent-prompts.git .agent-prompts
+
+# Update prompts
+git submodule update --remote
+```
+
+### Container Setup
+
+```bash
+# Build agent container
+DOCKER_BUILDKIT=1 docker build \
+  --progress=plain \
+  --no-cache \
+  -t agent-base:0.1.0 \
+  -f containers/agent-base.Dockerfile \
+  containers/
+```
+
+## Prompt Reference
+
+The `do/` directory contains stage-specific prompts:
+
+| Prompt | Purpose | Input | Output |
+|--------|---------|-------|--------|
+| `create-prd.md` | Generate PRD from feature request | User prompt | `prds/prd-*.md` |
+| `generate-tasks.md` | Decompose PRD into tickets | PRD file | Epic + tasks in Beads |
+| `prepare-task.md` | Curate context for task | Task ID | XML context spec |
+| `execute-task.md` | Implement single task | Task with context | Code changes |
+| `execute-epic.md` | Orchestrate parallel execution | Epic ID | Completed tasks |
+
+The `context/` directory contains reference material:
+
+| File | Purpose |
+|------|---------|
+| `project-management.md` | Beads workflow, dot notation, dependencies |
