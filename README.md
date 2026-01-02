@@ -121,23 +121,6 @@ flowchart LR
     M --> O
 ```
 
-### Execution Modes
-
-```mermaid
-flowchart TD
-    T[Task Ready] --> A{Automatic?}
-    A -->|Yes| C[Container Agent]
-    C --> E{Exit Code}
-    E -->|0| B[Status: blocked]
-    E -->|!= 0| F[Log Error]
-    F --> H[Human Fallback]
-    A -->|Complex/Blocked| H
-    H --> D{Resolved?}
-    D -->|Yes| B
-    D -->|No| W[Add Comment]
-    W --> H
-    B --> R[Ready for Review]
-```
 
 ## Tooling Philosophy: Shift Left
 
