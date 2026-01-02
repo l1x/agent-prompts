@@ -58,27 +58,6 @@ Agent completes → Status: blocked → Human reviews → Merged or feedback
 
 ## How It Works
 
-### Development Pipeline
-
-```mermaid
-flowchart TD
-    A[Feature Request] --> B[create-prd.md]
-    B --> C[PRD Document]
-    C --> D[generate-tasks.md]
-    D --> E[Epic + Tasks in Beads]
-    E --> F{bd ready}
-    F --> G[prepare-task.md]
-    G --> H[Task with Context]
-    H --> I[execute-task.md]
-    I --> J{Success?}
-    J -->|Yes| K[Status: blocked]
-    J -->|No| L[Human Fallback]
-    L --> I
-    K --> M[Human Review]
-    M -->|Approved| N[Merged]
-    M -->|Feedback| I
-```
-
 ### Stage Details
 
 | Stage | Input | Output | Actor |
