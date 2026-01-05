@@ -34,7 +34,7 @@ Create a Homebrew formula for the following project using pre-built binaries.
    curl -sL <INTEL_TARBALL_URL> | shasum -a 256
    ```
 
-2. **Create the formula** at `Formula/[PROJECT_NAME].rb`:
+1. **Create the formula** at `Formula/[PROJECT_NAME].rb`:
 
    ```ruby
    class [ProjectNameCamelCase] < Formula
@@ -87,9 +87,9 @@ Create a Homebrew formula for the following project using pre-built binaries.
    end
    ```
 
-3. **Create or update README.md**:
+1. **Create or update README.md**:
 
-   ```markdown
+   ````markdown
    # Homebrew Tap
 
    ## Installation
@@ -98,11 +98,12 @@ Create a Homebrew formula for the following project using pre-built binaries.
    brew tap [USERNAME]/[TAPNAME]
    brew install [PROJECT_NAME]
    ```
+   ````
 
    ## Available Formulae
 
    | Formula        | Description         |
-   |----------------|---------------------|
+   | -------------- | ------------------- |
    | [PROJECT_NAME] | [SHORT_DESCRIPTION] |
 
    ## Updating
@@ -111,9 +112,12 @@ Create a Homebrew formula for the following project using pre-built binaries.
    brew update
    brew upgrade [PROJECT_NAME]
    ```
+
    ```
 
-4. **Commit changes** with message: `[PROJECT_NAME] [VERSION]`
+   ```
+
+1. **Commit changes** with message: `[PROJECT_NAME] [VERSION]`
 
 ## Tap Naming Reference
 
@@ -129,6 +133,7 @@ Create a Homebrew formula for the following project using pre-built binaries.
 # Create Homebrew Tap Formula
 
 ## Project Details
+
 - **Formula name**: nacre
 - **Source repository**: https://github.com/l1x/nacre
 - **Description**: Agentic project management UI
@@ -137,6 +142,7 @@ Create a Homebrew formula for the following project using pre-built binaries.
 - **Version**: 0.9.2
 
 ## Binary Configuration
+
 - **Binary name**: nacre
 - **ARM tarball URL**: https://github.com/l1x/nacre/releases/download/v0.9.2/nacre-aarch64-apple-darwin.tar.gz
 - **Intel tarball URL**: N/A (ARM-only)
