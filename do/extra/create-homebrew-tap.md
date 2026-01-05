@@ -1,102 +1,168 @@
-  # Create Homebrew Tap Formula
+<!--file:create-homebrew-tap.md-->
 
-  ## Task
-  Create a Homebrew formula for the following project in this tap repository.
+# Create Homebrew Tap Formula
 
-  ## Project Details
-  - **Formula name**: [PROJECT_NAME]
-  - **Source repository**: [GITHUB_URL]
-  - **Description**: [SHORT_DESCRIPTION]
-  - **Homepage**: [HOMEPAGE_URL]
-  - **License**: [LICENSE_TYPE]
-  - **Version**: [VERSION]
-  - **Tarball URL**: [RELEASE_TARBALL_URL]
+## Task
 
-  ## Build Configuration
-  - **Language**: [rust|go|python|etc.]
-  - **Build dependencies**: [e.g., rust, go, cmake]
-  - **Runtime dependencies**: [e.g., openssl, libpq, or "none"]
-  - **Install command**: [e.g., "cargo install", "go build", "make install"]
-  - **Binary name**: [name of the installed binary]
-  - **Test command**: [e.g., "--version", "--help", "version"]
+Create a Homebrew formula for the following project using pre-built binaries.
 
-  ## Instructions
+## Project Details
 
-  1. **Compute SHA256** of the release tarball:
-     ```bash
-     curl -sL <TARBALL_URL> | shasum -a 256
+- **Formula name**: [PROJECT_NAME]
+- **Source repository**: [GITHUB_URL]
+- **Description**: [SHORT_DESCRIPTION]
+- **Homepage**: [HOMEPAGE_URL]
+- **License**: [LICENSE_TYPE]
+- **Version**: [VERSION]
 
-  2. Create the formula at Formula/[PROJECT_NAME].rb:
-  class [ProjectNameCamelCase] < Formula
-    desc "[SHORT_DESCRIPTION]"
-    homepage "[HOMEPAGE_URL]"
-    url "[TARBALL_URL]"
-    sha256 "[COMPUTED_SHA256]"
-    license "[LICENSE_TYPE]"
+## Binary Configuration
 
-    depends_on "[LANGUAGE]" => :build
-    # Add any runtime dependencies here
+- **Binary name**: [name of the installed binary]
+- **ARM tarball URL**: [URL to aarch64-apple-darwin.tar.gz]
+- **Intel tarball URL**: [URL to x86_64-apple-darwin.tar.gz, or "N/A" if ARM-only]
+- **Test command**: [e.g., "--version", "--help"]
 
-    def install
-      # For Rust:
-      system "cargo", "install", *std_cargo_args
-      # For Go:
-      # system "go", "build", *std_go_args(ldflags: "-s -w")
-    end
+## Instructions
 
-    test do
-      assert_match "[PROJECT_NAME]", shell_output("#{bin}/[BINARY_NAME] [TEST_COMMAND]")
-    end
+1. **Compute SHA256** for each architecture:
+
+   ```bash
+   # ARM (Apple Silicon)
+   curl -sL <ARM_TARBALL_URL> | shasum -a 256
+
+   # Intel (if applicable)
+   curl -sL <INTEL_TARBALL_URL> | shasum -a 256
+   ```
+
+2. **Create the formula** at `Formula/[PROJECT_NAME].rb`:
+
+   ```ruby
+   class [ProjectNameCamelCase] < Formula
+     desc "[SHORT_DESCRIPTION]"
+     homepage "[HOMEPAGE_URL]"
+     version "[VERSION]"
+     license "[LICENSE_TYPE]"
+
+     on_arm do
+       url "[ARM_TARBALL_URL]"
+       sha256 "[ARM_SHA256]"
+     end
+
+     on_intel do
+       url "[INTEL_TARBALL_URL]"
+       sha256 "[INTEL_SHA256]"
+     end
+
+     def install
+       bin.install "[BINARY_NAME]"
+     end
+
+     test do
+       assert_match "[BINARY_NAME]", shell_output("#{bin}/[BINARY_NAME] [TEST_COMMAND]")
+     end
+   end
+   ```
+
+   **For ARM-only projects**, use this simpler format:
+
+   ```ruby
+   class [ProjectNameCamelCase] < Formula
+     desc "[SHORT_DESCRIPTION]"
+     homepage "[HOMEPAGE_URL]"
+     version "[VERSION]"
+     license "[LICENSE_TYPE]"
+
+     depends_on arch: :arm64
+
+     url "[ARM_TARBALL_URL]"
+     sha256 "[ARM_SHA256]"
+
+     def install
+       bin.install "[BINARY_NAME]"
+     end
+
+     test do
+       assert_match "[BINARY_NAME]", shell_output("#{bin}/[BINARY_NAME] [TEST_COMMAND]")
+     end
+   end
+   ```
+
+3. **Create or update README.md**:
+
+   ```markdown
+   # Homebrew Tap
+
+   ## Installation
+
+   ```bash
+   brew tap [USERNAME]/[TAPNAME]
+   brew install [PROJECT_NAME]
+   ```
+
+   ## Available Formulae
+
+   | Formula        | Description         |
+   |----------------|---------------------|
+   | [PROJECT_NAME] | [SHORT_DESCRIPTION] |
+
+   ## Updating
+
+   ```bash
+   brew update
+   brew upgrade [PROJECT_NAME]
+   ```
+   ```
+
+4. **Commit changes** with message: `[PROJECT_NAME] [VERSION]`
+
+## Tap Naming Reference
+
+- GitHub repo: `github.com/[USERNAME]/homebrew-[TAPNAME]`
+- Brew command: `brew tap [USERNAME]/[TAPNAME]`
+- Install: `brew install [USERNAME]/[TAPNAME]/[PROJECT_NAME]` or just `brew install [PROJECT_NAME]`
+
+---
+
+## Example: nacre
+
+```markdown
+# Create Homebrew Tap Formula
+
+## Project Details
+- **Formula name**: nacre
+- **Source repository**: https://github.com/l1x/nacre
+- **Description**: Agentic project management UI
+- **Homepage**: https://github.com/l1x/nacre
+- **License**: MIT
+- **Version**: 0.9.2
+
+## Binary Configuration
+- **Binary name**: nacre
+- **ARM tarball URL**: https://github.com/l1x/nacre/releases/download/v0.9.2/nacre-aarch64-apple-darwin.tar.gz
+- **Intel tarball URL**: N/A (ARM-only)
+- **Test command**: --version
+```
+
+**Resulting formula:**
+
+```ruby
+class Nacre < Formula
+  desc "Agentic project management UI"
+  homepage "https://github.com/l1x/nacre"
+  version "0.9.2"
+  license "MIT"
+
+  depends_on arch: :arm64
+
+  url "https://github.com/l1x/nacre/releases/download/v0.9.2/nacre-aarch64-apple-darwin.tar.gz"
+  sha256 "722a06192dc56f0ad73a6e9db3f4fde93fa2c22038e43663eac3487186014007"
+
+  def install
+    bin.install "nacre"
   end
-  3. Create or update README.md:
-  # Homebrew Tap
 
-  ## Installation
-
-  ```bash
-  brew tap [USERNAME]/[TAPNAME]
-  brew install [PROJECT_NAME]
-
-  Available Formulae
-
-  | Formula        | Description         |
-  |----------------|---------------------|
-  | [PROJECT_NAME] | [SHORT_DESCRIPTION] |
-
-  Updating
-
-  brew update
-  brew upgrade [PROJECT_NAME]
-
-  4. Commit changes with message: [PROJECT_NAME] [VERSION]
-
-  Tap Naming Reference
-
-  - GitHub repo: github.com/[USERNAME]/homebrew-[TAPNAME]
-  - Brew command: brew tap [USERNAME]/[TAPNAME]
-  - Install: brew install [USERNAME]/[TAPNAME]/[PROJECT_NAME] or just brew install [PROJECT_NAME]
-
-  ---
-
-  **Example filled in for nacre:**
-
-  ```markdown
-  # Create Homebrew Tap Formula
-
-  ## Project Details
-  - **Formula name**: nacre
-  - **Source repository**: https://github.com/l1x/nacre
-  - **Description**: A modern shell written in Rust
-  - **Homepage**: https://github.com/l1x/nacre
-  - **License**: MIT
-  - **Version**: 0.9.1
-  - **Tarball URL**: https://github.com/l1x/nacre/archive/refs/tags/v0.9.1.tar.gz
-
-  ## Build Configuration
-  - **Language**: rust
-  - **Build dependencies**: rust
-  - **Runtime dependencies**: none
-  - **Install command**: cargo install
-  - **Binary name**: nacre
-  - **Test command**: --version
-
+  test do
+    assert_match "nacre", shell_output("#{bin}/nacre --version")
+  end
+end
+```
