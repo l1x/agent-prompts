@@ -52,8 +52,8 @@ Implement a single, atomic task defined in a Beads ticket, ensuring code quality
 1. **Completion**
    - If verification fails, fix issues and repeat Step 4.
    - If verification passes:
-     - Output a summary of changes made into the description of the task
-     - Mark ticket blocked: `bd update <id> --status blocked`
+     - Update the ticket description: prepend "**PENDING REVIEW**\n\n" to the top, then add a summary of changes made, keeping the original description intact below
+     - Mark ticket blocked: `bd update <id> --status=blocked`
      - Run `bd sync`
 
 ## Available mise Tasks
