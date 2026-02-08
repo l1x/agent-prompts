@@ -33,9 +33,10 @@ Technical Project Managers:
 
 ### Required Sections
 
-1. **Overview** - Brief feature description, problem statement, and primary goal
+1. **Overview** - Brief feature description and primary goal
+1. **Problem Statement** - The core problem, why existing approaches fail, and business impact. Standalone section — do not bury in Overview
 1. **Goals** - 3-5 measurable objectives (SMART format preferred)
-1. **Job Stories**:
+1. **Job Stories** - Derived from personas (see Users & Value below if included). Format:
    - As a [role], I can [functionality], so that [benefit].
 1. **Assumptions** - List any assumptions made during PRD creation
 1. **Functional Requirements** - Numbered list with acceptance criteria per item
@@ -49,15 +50,25 @@ Technical Project Managers:
    - Acceptance: [Verifiable condition]
 ```
 
-7. **Non-Goals** - Explicit exclusions (what this feature will not address)
-8. **Success Metrics** - Quantitative metrics for post-launch validation (include both product and business metrics)
+8. **Technical Constraints** - Explicit technology stack, allowed libraries, deployment target, and boundaries. Critical for agentic development — without this, agents introduce arbitrary frameworks and architecture. Include:
+   - Language, build tool, CSS framework, visualization libraries
+   - Browser APIs and compatibility targets
+   - Deployment model (static, serverless, container)
+   - Explicit prohibitions (e.g., "no React", "no server-side runtime")
+9. **Non-Goals** - Explicit exclusions (what this feature will not address)
+10. **Success Metrics** - Quantitative metrics for post-launch validation (include both product and business metrics). Map from persona success signals when Users & Value is present
 
 ### Optional Sections
 
-1. **Design Considerations** - UI/UX constraints, mockups
-2. **Technical Constraints** - Dependencies, environment, execution context
-3. **Open Questions** - Unresolved items
-4. **Diagram** - Mermaid diagram illustrating the process if applicable
+1. **Users & Value (Personas)** - Place after Problem Statement, before Goals. Defines who cares and why, then drives Job Stories and Success Metrics. Per persona:
+   - **Pain:** What problem they face today
+   - **Key questions they bring:** What they need answered
+   - **Success signal:** How you'll know this works for them
+   - Map each persona's key questions → Job Stories. Map each success signal → Success Metrics
+2. **Design Principles** - 3-5 opinionated statements that guide implementation decisions. Valuable when scope is large or multiple valid approaches exist. These resolve ambiguity for developers and agents without requiring escalation
+3. **Design Considerations** - UI/UX constraints, mockups
+4. **Open Questions** - Unresolved items
+5. **Diagram** - SVG diagram illustrating the process if applicable
 
 ## Output
 
