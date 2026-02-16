@@ -4,5 +4,5 @@ Verify all Terraform module sources in this codebase use the S3 format:
   Check:
   1. All `source = "..."` in *.tf files (excluding .terraform/)
   2. Flag any local paths, git URLs, or registry references
-  3. Flag missing version suffixes (e.g., -v0.9.1)
+  3. Flag missing version suffixes (e.g., -v1.0.0)
   4. Report violations with file:line and the invalid source value
