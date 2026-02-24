@@ -1,0 +1,42 @@
+[workflow]
+name = "dev-task-pr-gate"
+description = "Plan, implement, review, fix, PR, wait for merge"
+version = "1.0.0"
+
+[[steps]]
+id = "plan"
+role = "planner"
+prompt_file = "do/plan.md"
+
+[[steps]]
+id = "implement"
+role = "worker"
+prompt_file = "do/implement.md"
+depends_on = ["plan"]
+
+[[steps]]
+id = "review"
+role = "reviewer"
+prompt_file = "do/review.md"
+depends_on = ["implement"]
+
+[[steps]]
+id = "fix"
+role = "worker"
+prompt_file = "do/implement.md"
+depends_on = ["review"]
+condition = "review.result == 'FAIL'"
+max_retries = 3
+
+[[steps]]
+id = "pr"
+role = "any"
+prompt_file = "do/pr.md"
+depends_on = ["review"]
+condition = "review.result == 'PASS'"
+
+[[steps]]
+id = "merge-wait"
+role = "any"
+prompt_file = "do/merge-wait.md"
+depends_on = ["pr"]
