@@ -1,0 +1,19 @@
+[workflow]
+name = "issue-review"
+description = "Review implementation and PR for code quality, security, and issue alignment"
+version = "3.0.0"
+include = []
+
+[workflow.inputs]
+mission = { required = true }
+worktree_path = { required = true }
+github_issue = { required = true }
+context = { required = false, default = "" }
+
+[[steps]]
+id = "review"
+prompt_file = "prompts/do/review.md"
+
+[[steps]]
+id = "security-review"
+prompt_file = "prompts/do/security-review.md"

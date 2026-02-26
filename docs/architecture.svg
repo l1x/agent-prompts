@@ -26,8 +26,8 @@
   <!-- Title bar -->
   <rect x="0" y="0" width="1200" height="60" rx="10" fill="#181818"/>
   <rect x="0" y="50" width="1200" height="10" fill="#181818"/>
-  <text x="36" y="32" class="title">agent-prompts v2</text>
-  <text x="36" y="48" class="subtitle">Final Agent = Workflow step + Core prompt + Stack prompt + Template resolution</text>
+  <text x="36" y="32" class="title">agent-prompts v3</text>
+  <text x="36" y="48" class="subtitle">Final Agent = Workflow step + Core prompt + Included docs + Template resolution</text>
 
   <!-- Legend -->
   <circle cx="1040" cy="28" r="5" fill="#8a8"/>
@@ -124,159 +124,143 @@
   <text x="280" y="640" class="file-desc">Go-to-market, messaging, positioning</text>
 
   <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- WORKFLOWS PANEL  (y=70, h=360, bottom=430)                -->
+  <!-- WORKFLOWS PANEL  (y=70, h=540, bottom=610)                -->
   <!-- ══════════════════════════════════════════════════════════ -->
 
-  <rect x="620" y="70" width="560" height="360" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
+  <rect x="620" y="70" width="560" height="540" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
   <text x="640" y="96" class="dir-label">workflows/</text>
-  <text x="728" y="96" class="subtitle">Steps reference prompts/ directly — no roles layer</text>
+  <text x="728" y="96" class="subtitle">Short sessions, tight context — orchestrator dispatches</text>
 
-  <!-- dev-task.toml (y=112, h=168, bottom=280) -->
-  <rect x="636" y="112" width="528" height="168" rx="6" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+  <!-- prd-to-issue.toml (y=112, h=90) -->
+  <rect x="636" y="112" width="528" height="90" rx="6" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
   <circle cx="648" cy="132" r="4" fill="#8a8"/>
-  <text x="660" y="136" class="file-name">dev-task.toml</text>
-  <text x="800" y="136" class="file-desc">stack = "rust" | "astro"</text>
+  <text x="660" y="136" class="file-name">prd-to-issue.toml</text>
+  <text x="830" y="136" class="file-desc">PRD in, GitHub Issues out</text>
 
-  <!-- step boxes row -->
-  <rect x="652" y="152" width="100" height="44" rx="4" class="step-box"/>
-  <text x="672" y="170" class="step-name">plan</text>
-  <text x="660" y="186" class="step-detail">do/plan.md</text>
+  <rect x="652" y="152" width="160" height="38" rx="4" class="step-box"/>
+  <text x="672" y="170" class="step-name">decompose</text>
+  <text x="660" y="184" class="step-detail">prompts/pm/github-project-manager.md</text>
 
-  <line x1="752" y1="174" x2="770" y2="174" class="arrow-h"/>
-  <polygon points="767,171 774,174 767,177" fill="#777"/>
+  <!-- precise-context.toml (y=214, h=90) -->
+  <rect x="636" y="214" width="528" height="90" rx="6" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+  <circle cx="648" cy="234" r="4" fill="#8a8"/>
+  <text x="660" y="238" class="file-name">precise-context.toml</text>
+  <text x="830" y="238" class="file-desc">Issue in, XML context to issue</text>
 
-  <rect x="774" y="152" width="114" height="44" rx="4" class="step-box"/>
-  <text x="794" y="170" class="step-name">implement</text>
-  <text x="782" y="186" class="step-detail">do/implement.md</text>
+  <rect x="652" y="254" width="130" height="38" rx="4" class="step-box"/>
+  <text x="672" y="272" class="step-name">plan</text>
+  <text x="660" y="286" class="step-detail">prompts/do/plan.md</text>
 
-  <line x1="888" y1="174" x2="906" y2="174" class="arrow-h"/>
-  <polygon points="903,171 910,174 903,177" fill="#777"/>
+  <text x="796" y="278" class="step-detail">include = [] (caller-provided)</text>
 
-  <rect x="910" y="152" width="90" height="44" rx="4" class="step-box"/>
-  <text x="940" y="170" class="step-name">qa</text>
-  <text x="920" y="186" class="step-detail">do/qa.md</text>
+  <!-- develop-feature.toml (y=316, h=110) -->
+  <rect x="636" y="316" width="528" height="110" rx="6" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+  <circle cx="648" cy="336" r="4" fill="#8a8"/>
+  <text x="660" y="340" class="file-name">develop-feature.toml</text>
+  <text x="830" y="340" class="file-desc">Issue+context in, code committed</text>
 
-  <line x1="1000" y1="174" x2="1018" y2="174" class="arrow-h"/>
-  <polygon points="1015,171 1022,174 1015,177" fill="#777"/>
+  <rect x="652" y="356" width="114" height="38" rx="4" class="step-box"/>
+  <text x="672" y="374" class="step-name">implement</text>
+  <text x="660" y="388" class="step-detail">prompts/do/implement.md</text>
 
-  <rect x="1022" y="152" width="126" height="44" rx="4" class="step-box"/>
-  <text x="1058" y="170" class="step-name">review</text>
-  <text x="1036" y="186" class="step-detail">do/review.md</text>
+  <line x1="766" y1="375" x2="784" y2="375" class="arrow-h"/>
+  <polygon points="781,372 788,375 781,378" fill="#777"/>
 
-  <!-- stack annotation -->
-  <text x="660" y="218" class="step-detail">+ stacks/rust.md inherited on implement, qa, review</text>
+  <rect x="788" y="356" width="90" height="38" rx="4" class="step-box"/>
+  <text x="818" y="374" class="step-name">qa</text>
+  <text x="798" y="388" class="step-detail">prompts/do/qa.md</text>
 
-  <!-- workflow step structure -->
-  <line x1="652" y1="234" x2="1148" y2="234" stroke="#444" stroke-width="0.5" stroke-dasharray="4,3"/>
-  <text x="660" y="252" class="info-desc">step.prompt_file -> prompts/ file</text>
-  <text x="660" y="268" class="info-desc">workflow.stack -> inherited by all steps (overridable)</text>
+  <!-- loop back arrow: qa FAIL → implement -->
+  <path d="M833,394 L833,410 L709,410 L709,394" class="arrow-h" fill="none"/>
+  <polygon points="705,397 709,390 713,397" fill="#777"/>
+  <text x="736" y="420" class="step-detail">on_fail (max 3)</text>
+  <text x="900" y="378" class="step-detail">include = [] (caller-provided)</text>
 
-  <!-- pm-epic.toml (y=292, h=124, bottom=416) -->
-  <rect x="636" y="292" width="528" height="124" rx="6" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
-  <circle cx="648" cy="312" r="4" fill="#8a8"/>
-  <text x="660" y="316" class="file-name">pm-epic.toml</text>
-  <text x="800" y="316" class="file-desc">interactive, no stack</text>
+  <!-- issue-review.toml (y=438, h=110) -->
+  <rect x="636" y="438" width="528" height="110" rx="6" fill="#1a1a1a" stroke="#444" stroke-width="1"/>
+  <circle cx="648" cy="458" r="4" fill="#8a8"/>
+  <text x="660" y="462" class="file-name">issue-review.toml</text>
+  <text x="830" y="462" class="file-desc">Code reviewed, verdict out</text>
 
-  <!-- pm step boxes (wider to hold long filenames) -->
-  <rect x="652" y="332" width="200" height="44" rx="4" class="step-box"/>
-  <text x="672" y="350" class="step-name">decompose-prd</text>
-  <text x="660" y="366" class="step-detail">pm/github-project-manager.md</text>
+  <rect x="652" y="478" width="130" height="38" rx="4" class="step-box"/>
+  <text x="672" y="496" class="step-name">review</text>
+  <text x="660" y="510" class="step-detail">prompts/do/review.md</text>
 
-  <line x1="852" y1="354" x2="874" y2="354" class="arrow-h"/>
-  <polygon points="871,351 878,354 871,357" fill="#777"/>
+  <rect x="800" y="478" width="170" height="38" rx="4" class="step-box"/>
+  <text x="820" y="496" class="step-name">security-review</text>
+  <text x="808" y="510" class="step-detail">prompts/do/security-review.md</text>
 
-  <rect x="878" y="332" width="170" height="44" rx="4" class="step-box"/>
-  <text x="898" y="350" class="step-name">execute-tasks</text>
-  <text x="886" y="366" class="step-detail">pm/github-issue.md</text>
+  <text x="660" y="538" class="step-detail">parallel (no depends_on) — diagnostic only, verdict to orchestrator</text>
 
-  <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- COMPOSITION FLOW  (y=450, h=270, bottom=720)              -->
-  <!-- ══════════════════════════════════════════════════════════ -->
-
-  <rect x="620" y="450" width="270" height="270" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
-  <text x="640" y="476" class="dir-label">Composition Flow</text>
-
-  <rect x="640" y="496" width="230" height="38" rx="5" fill="#1a1a1a" stroke="#484848" stroke-width="1"/>
-  <text x="656" y="513" class="info-label">1. Workflow step</text>
-  <text x="656" y="527" class="info-desc">prompt_file + inherited stack</text>
-
-  <line x1="755" y1="534" x2="755" y2="548" class="connector"/>
-  <polygon points="751,545 755,552 759,545" fill="#777"/>
-
-  <rect x="640" y="552" width="230" height="38" rx="5" fill="#1a1a1a" stroke="#484848" stroke-width="1"/>
-  <text x="656" y="569" class="info-label">2. Stack prompt</text>
-  <text x="656" y="583" class="info-desc">rust, astro, aws, mise</text>
-
-  <line x1="755" y1="590" x2="755" y2="604" class="connector"/>
-  <polygon points="751,601 755,608 759,601" fill="#777"/>
-
-  <rect x="640" y="608" width="230" height="38" rx="5" fill="#1a1a1a" stroke="#484848" stroke-width="1"/>
-  <text x="656" y="625" class="info-label">3. Template resolution</text>
-  <text x="656" y="639" class="info-desc">{{mission}}, {{worktree_path}}</text>
-
-  <line x1="755" y1="646" x2="755" y2="666" class="connector"/>
-  <polygon points="751,663 755,670 759,663" fill="#777"/>
-
-  <rect x="705" y="672" width="120" height="28" rx="14" fill="#8a8"/>
-  <text x="731" y="690" font-size="12" font-weight="600" fill="#111">Final Agent</text>
+  <!-- Orchestration flow arrow between workflows -->
+  <line x1="636" y1="202" x2="636" y2="214" class="connector"/>
+  <polygon points="632,211 636,218 640,211" fill="#777"/>
+  <line x1="636" y1="304" x2="636" y2="316" class="connector"/>
+  <polygon points="632,313 636,320 640,313" fill="#777"/>
+  <line x1="636" y1="426" x2="636" y2="438" class="connector"/>
+  <polygon points="632,435 636,442 640,435" fill="#777"/>
 
   <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- TEMPLATE VARIABLES  (y=450, h=180, bottom=630)            -->
+  <!-- COMPOSITION FLOW  (y=630, h=250, bottom=880)              -->
   <!-- ══════════════════════════════════════════════════════════ -->
 
-  <rect x="910" y="450" width="270" height="180" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
-  <text x="930" y="476" class="dir-label">Template Variables</text>
+  <rect x="620" y="630" width="270" height="250" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
+  <text x="640" y="656" class="dir-label">Composition Flow</text>
 
-  <text x="930" y="502" class="file-name" font-size="11">{{mission}}</text>
-  <text x="1070" y="502" class="info-desc">Task goal</text>
+  <rect x="640" y="672" width="230" height="32" rx="5" fill="#1a1a1a" stroke="#484848" stroke-width="1"/>
+  <text x="656" y="693" class="info-label">1. prompt_file</text>
 
-  <text x="930" y="524" class="file-name" font-size="11">{{prd}}</text>
-  <text x="1070" y="524" class="info-desc">PRD document</text>
+  <line x1="755" y1="704" x2="755" y2="714" class="connector"/>
+  <polygon points="751,711 755,718 759,711" fill="#777"/>
 
-  <text x="930" y="546" class="file-name" font-size="11">{{worktree_path}}</text>
-  <text x="1070" y="546" class="info-desc">Working dir</text>
+  <rect x="640" y="718" width="230" height="32" rx="5" fill="#1a1a1a" stroke="#484848" stroke-width="1"/>
+  <text x="656" y="739" class="info-label">2. each include[] entry</text>
 
-  <text x="930" y="568" class="file-name" font-size="11">{{context}}</text>
-  <text x="1070" y="568" class="info-desc">Project context</text>
+  <line x1="755" y1="750" x2="755" y2="760" class="connector"/>
+  <polygon points="751,757 755,764 759,757" fill="#777"/>
 
-  <text x="930" y="590" class="file-name" font-size="11">{{github_repo}}</text>
-  <text x="1070" y="590" class="info-desc">owner/repo</text>
+  <rect x="640" y="764" width="230" height="32" rx="5" fill="#1a1a1a" stroke="#484848" stroke-width="1"/>
+  <text x="656" y="785" class="info-label">3. Template resolution</text>
 
-  <text x="930" y="612" class="file-name" font-size="11">{{github_issue}}</text>
-  <text x="1070" y="612" class="info-desc">Issue number</text>
+  <line x1="755" y1="796" x2="755" y2="806" class="connector"/>
+  <polygon points="751,803 755,810 759,803" fill="#777"/>
+
+  <rect x="705" y="810" width="120" height="24" rx="12" fill="#8a8"/>
+  <text x="731" y="826" font-size="12" font-weight="600" fill="#111">Final Agent</text>
 
   <!-- ══════════════════════════════════════════════════════════ -->
-  <!-- TASK SIZING  (y=650, h=160, bottom=810)                   -->
+  <!-- TEMPLATE VARIABLES  (y=630, h=160, bottom=790)            -->
   <!-- ══════════════════════════════════════════════════════════ -->
 
-  <rect x="910" y="650" width="270" height="160" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
-  <text x="930" y="676" class="dir-label">Task Sizing</text>
+  <rect x="910" y="630" width="270" height="160" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
+  <text x="930" y="656" class="dir-label">Template Variables</text>
 
-  <text x="930" y="698" class="info-label">XS</text>
-  <text x="962" y="698" class="info-desc">&lt;30m, 1 file, config tweak</text>
+  <text x="930" y="680" class="file-name" font-size="11">{{mission}}</text>
+  <text x="1070" y="680" class="info-desc">Task goal</text>
 
-  <text x="930" y="718" class="info-label">S</text>
-  <text x="962" y="718" class="info-desc">30m-1h, 1-2 files</text>
+  <text x="930" y="700" class="file-name" font-size="11">{{prd}}</text>
+  <text x="1070" y="700" class="info-desc">PRD document</text>
 
-  <text x="930" y="738" class="info-label">M</text>
-  <text x="962" y="738" class="info-desc">1-2h, 2-5 files</text>
+  <text x="930" y="720" class="file-name" font-size="11">{{worktree_path}}</text>
+  <text x="1070" y="720" class="info-desc">Working dir</text>
 
-  <text x="930" y="758" class="info-label">L</text>
-  <text x="962" y="758" class="info-desc">2-4h, 5+ files</text>
+  <text x="930" y="740" class="file-name" font-size="11">{{context}}</text>
+  <text x="1070" y="740" class="info-desc">Project context</text>
 
-  <text x="930" y="778" class="info-label">XL</text>
-  <text x="962" y="778" class="info-desc">4-8h, architectural scope</text>
+  <text x="930" y="760" class="file-name" font-size="11">{{github_repo}}</text>
+  <text x="1070" y="760" class="info-desc">owner/repo</text>
 
-  <text x="930" y="800" class="missing-desc">L/XL: decompose into smaller tasks</text>
+  <text x="930" y="780" class="file-name" font-size="11">{{github_issue}}</text>
+  <text x="1070" y="780" class="info-desc">Issue number</text>
 
   <!-- ══════════════════════════════════════════════════════════ -->
   <!-- PROGRESS  (y=830, h=50, bottom=880)                       -->
   <!-- ══════════════════════════════════════════════════════════ -->
 
-  <rect x="20" y="830" width="1160" height="50" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
+  <rect x="20" y="830" width="280" height="50" rx="8" fill="#161616" stroke="#383838" stroke-width="1"/>
   <text x="40" y="854" class="dir-label">Progress</text>
-  <text x="130" y="854" class="subtitle">16 of 16 files  |  prompts: 14/14  |  workflows: 2/2</text>
-  <rect x="40" y="864" width="1120" height="6" rx="3" fill="#222"/>
-  <rect x="40" y="864" width="1120" height="6" rx="3" fill="#8a8"/>
+  <text x="130" y="854" class="subtitle">18/18  |  prompts: 14  |  workflows: 4</text>
+  <rect x="40" y="864" width="240" height="6" rx="3" fill="#222"/>
+  <rect x="40" y="864" width="240" height="6" rx="3" fill="#8a8"/>
 
 </svg>

@@ -1,0 +1,22 @@
+[workflow]
+name = "develop-feature"
+description = "Implement a feature from pre-planned context, loop QA until tests pass"
+version = "3.0.0"
+include = []
+
+[workflow.inputs]
+mission = { required = true }
+worktree_path = { required = true }
+github_issue = { required = true }
+context = { required = true }
+
+[[steps]]
+id = "implement"
+prompt_file = "prompts/do/implement.md"
+
+[[steps]]
+id = "qa"
+prompt_file = "prompts/do/qa.md"
+depends_on = ["implement"]
+on_fail = "implement"
+max_retries = 3

@@ -7,10 +7,38 @@ Reusable prompt library for AI agents. Designed as a git submodule (`.agent-prom
 ## Architecture
 
 ```
-Final Agent = Workflow step + Core prompt + Stack prompt(s) + Template resolution
+Final Agent = Workflow step + Core prompt + Included docs + Template resolution
 ```
 
-Composition at expansion time: `prompt_file` content + `\n\n---\n\n` + each `stacks/{name}.md`.
+Composition at expansion time:
+```
+rendered = prompt_file
+         + "\n\n---\n\n" + each workflow.include entry (or step.include override)
+         + template resolution
+```
+
+## Orchestration Flow
+
+GitHub Issues is the shared state between sessions. The orchestrator dispatches workflows — no single agent runs end-to-end.
+
+```
+Orchestrator
+    |
+    v
+[prd-to-issue] ---- PRD in, GitHub Issues out
+    |  (for each issue)
+    v
+[precise-context] -- Issue in, XML context written to issue
+    |
+    v
+[develop-feature] -- Issue+context in, code committed
+    |
+    v
+[issue-review] ----- Code reviewed, verdict out
+    |
+    +-- PASS --> done
+    +-- FAIL --> orchestrator dispatches new [develop-feature]
+```
 
 ## Repository Structure
 
@@ -36,40 +64,58 @@ agent-prompts/
 │   └── biz/                        # Business
 │       └── gtm.md                  # Go-to-market, messaging, positioning
 ├── workflows/                      # DAG definitions for multi-step execution
-│   ├── dev-task.toml               # plan → implement → qa → review → [fix]
-│   └── pm-epic.toml                # decompose → track
+│   ├── prd-to-issue.toml           # decompose PRD into issues
+│   ├── precise-context.toml        # plan (explore + write XML context)
+│   ├── develop-feature.toml        # implement ↔ qa loop
+│   └── issue-review.toml           # review + security-review
 └── docs/
     └── architecture.svg            # Visual architecture diagram
 ```
 
 ## Workflows
 
-### dev-task.toml
+### prd-to-issue.toml
 
-Development lifecycle: `plan → implement → qa → review → fix (conditional)`.
+Decomposes a PRD into GitHub Issues with epics, dependencies, and sizing.
 
-- `workflow.stack` sets default stack for all steps (e.g., `["rust"]`, `["astro"]`)
-- `step.stack` overrides `workflow.stack` when present
-- The `fix` step re-runs `implement.md` when review verdict is FAIL (max 3 retries)
+- Single step: `decompose`
+- `github-project-manager.md` already contains all `gh` CLI patterns for issue creation
+- `include = []` — no additional docs needed
 
-### pm-epic.toml
+### precise-context.toml
 
-Project management: `decompose → track`.
+Explores the codebase and writes structured XML context into a GitHub issue.
 
-- No stack — PM prompts don't need language modifiers
-- Decomposes PRD into GitHub Issues with epics, dependencies, and sizing
+- Single step: `plan`
+- `include = []` — caller provides stacks and helpers at dispatch time
+- Output is written directly to the GitHub issue
+
+### develop-feature.toml
+
+Implements a feature from pre-planned context, loops QA until tests pass.
+
+- `implement → qa` — if QA fails, loops back to `implement` (max 3 retries)
+- `include = []` — caller provides stacks and helpers at dispatch time
+- Context is required — must come from a prior `precise-context` run
+
+### issue-review.toml
+
+Reviews implementation and PR for code quality, security, and issue alignment.
+
+- `review` and `security-review` run in parallel (no `depends_on`)
+- Diagnostic only — no fix step; FAIL verdict goes back to the orchestrator
 
 ## Workflow Schema
 
 | Field | Type | Location | Purpose |
 |-------|------|----------|---------|
-| `workflow.stack` | string[] | workflow | Default stack prompts for all steps |
+| `workflow.include` | string[] | workflow | Default `[]`; caller provides paths relative to repo root at dispatch time |
 | `workflow.inputs` | table | workflow | Template variables needed |
-| `step.prompt_file` | string | step | Path relative to `prompts/` |
-| `step.stack` | string[] | step | Override workflow stack |
+| `step.prompt_file` | string | step | Path relative to repo root |
+| `step.include` | string[] | step | Override `workflow.include` for this step |
 | `step.depends_on` | string[] | step | Step IDs that must complete first |
-| `step.condition` | string | step | Expression on prior step output |
-| `step.max_retries` | int | step | Retry count for conditional loops |
+| `step.on_fail` | string | step | Step ID to loop back to on failure |
+| `step.max_retries` | int | step | Max loop iterations before exit |
 
 ## Prompt Conventions
 
@@ -82,12 +128,12 @@ Project management: `decompose → track`.
 
 | Variable | Used by |
 |----------|---------|
-| `{{mission}}` | dev-task |
-| `{{worktree_path}}` | dev-task |
-| `{{github_issue}}` | dev-task |
-| `{{context}}` | dev-task, pm-epic |
-| `{{prd}}` | pm-epic |
-| `{{github_repo}}` | pm-epic |
+| `{{mission}}` | precise-context, develop-feature, issue-review |
+| `{{worktree_path}}` | precise-context, develop-feature, issue-review |
+| `{{github_issue}}` | precise-context, develop-feature, issue-review |
+| `{{github_repo}}` | prd-to-issue, precise-context |
+| `{{context}}` | all workflows |
+| `{{prd}}` | prd-to-issue |
 
 ## Task Sizing
 

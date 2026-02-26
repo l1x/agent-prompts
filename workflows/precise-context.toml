@@ -1,0 +1,16 @@
+[workflow]
+name = "precise-context"
+description = "Explore codebase and write precise XML context into a GitHub issue"
+version = "3.0.0"
+include = []
+
+[workflow.inputs]
+mission = { required = true }
+worktree_path = { required = true }
+github_issue = { required = true }
+github_repo = { required = true }
+context = { required = false, default = "" }
+
+[[steps]]
+id = "plan"
+prompt_file = "prompts/do/plan.md"

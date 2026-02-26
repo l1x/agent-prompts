@@ -1,0 +1,14 @@
+[workflow]
+name = "prd-to-issue"
+description = "Decompose a PRD into GitHub Issues with epics, dependencies, and sizing"
+version = "3.0.0"
+include = []
+
+[workflow.inputs]
+prd = { required = true }
+github_repo = { required = true }
+context = { required = false, default = "" }
+
+[[steps]]
+id = "decompose"
+prompt_file = "prompts/pm/github-project-manager.md"
