@@ -1,7 +1,7 @@
 ```yaml
 kind: prompt
 name: qa
-description: "Write tests, run them, and verify coverage against acceptance criteria"
+description: "Verify implementation quality and acceptance criteria coverage"
 inputs:
   - name: mission
     required: true
@@ -23,22 +23,18 @@ outputs:
 
 1. Read the plan and context from prior steps
 2. Explore `{{worktree_path}}` to understand:
-   - The testing framework already in use (do not introduce a new one)
+   - The testing framework already in use
    - Existing test patterns, file locations, and naming conventions
-   - What code was changed or added (via `git diff` or recent commits)
-3. Identify what needs testing:
+   - What code and tests were changed (via `git diff` or recent commits)
+3. Review test adequacy for changed behavior:
    - New or modified public functions and methods
    - Edge cases, error paths, and boundary conditions
    - Integration points between changed and existing code
-4. Write tests following existing project conventions:
-   - Place test files where the project already puts them
-   - Match the assertion style, setup/teardown patterns, and naming used elsewhere
-   - Prefer testing behavior over implementation details
-5. Run the full test suite:
-   - Use the project's test runner (e.g., `mise run test`, `cargo test`, `bun test`)
-   - Fix any failing tests — both new and existing
+4. Run the full test suite:
+   - Use the project's test runner (for example: `mise run test`, `cargo test`, `bun test`)
    - Run linting and type checks if available
-6. Verify coverage against acceptance criteria from the mission or linked issue
+5. Validate acceptance criteria coverage from the mission or linked issue
+6. If validation fails, report concrete gaps so the workflow can return to `implement`
 
 ## Output
 
@@ -47,8 +43,8 @@ Your output MUST be valid JSON:
 ```json
 {
   "verdict": "PASS",
-  "summary": "One-sentence assessment of test coverage and results",
-  "tests_written": [
+  "summary": "One-sentence assessment of quality and coverage",
+  "tests_reviewed": [
     {
       "file": "tests/test_feature.rs",
       "tests": ["test_happy_path", "test_invalid_input", "test_edge_case"]
@@ -69,17 +65,16 @@ Your output MUST be valid JSON:
 }
 ```
 
-`verdict` must be exactly `PASS` or `FAIL`. FAIL if any test fails or if critical acceptance criteria lack coverage.
+`verdict` must be exactly `PASS` or `FAIL`. Use `FAIL` if any test/check fails or if critical acceptance criteria are not covered.
 
 ## Constraints
 
-- Use the existing test framework — do not add a new one
+- Use the existing test framework; do not introduce a new one
 - Match the project's test style and conventions exactly
-- Do not modify production code — only add or fix tests
-- If production code has a bug that causes test failure, report it in `issues` and FAIL
-- Keep tests focused and independent — no test should depend on another's state
-- Do not test private internals unless the project already does so
-- Commit test files with message format: `test(scope): description`
+- QA is verification-only: do not modify production code or tests
+- Do not create commits
+- If a production bug is found, report it in `issues` and set `verdict` to `FAIL`
+- Keep findings concrete and actionable
 
 ## Context from prior steps
 

@@ -1,7 +1,7 @@
 [workflow]
 name = "issue-review"
 description = "Review implementation and PR for code quality, security, and issue alignment"
-version = "3.0.0"
+version = "1.0.0"
 include = []
 
 [workflow.inputs]

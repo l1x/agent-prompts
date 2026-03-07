@@ -1,7 +1,7 @@
 [workflow]
 name = "develop-feature"
-description = "Implement a feature from pre-planned context, loop QA until tests pass"
-version = "3.0.0"
+description = "Implement via TDD and use QA as an independent pass/fail gate"
+version = "1.0.0"
 include = []
 
 [workflow.inputs]
