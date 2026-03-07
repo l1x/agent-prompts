@@ -13,4 +13,4 @@ context = { required = false, default = "" }
 
 [[steps]]
 id = "plan"
-prompt_file = "prompts/do/plan.md"
+prompt_file = "do/plan.md"

@@ -12,8 +12,8 @@ context = { required = false, default = "" }
 
 [[steps]]
 id = "review"
-prompt_file = "prompts/do/review.md"
+prompt_file = "do/review.md"
 
 [[steps]]
 id = "security-review"
-prompt_file = "prompts/do/security-review.md"
+prompt_file = "do/security-review.md"

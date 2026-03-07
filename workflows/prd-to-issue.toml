@@ -11,4 +11,4 @@ context = { required = false, default = "" }
 
 [[steps]]
 id = "decompose"
-prompt_file = "prompts/pm/github-project-manager.md"
+prompt_file = "pm/github-project-manager.md"

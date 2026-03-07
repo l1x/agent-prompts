@@ -12,11 +12,11 @@ context = { required = true }
 
 [[steps]]
 id = "implement"
-prompt_file = "prompts/do/implement.md"
+prompt_file = "do/implement.md"
 
 [[steps]]
 id = "qa"
-prompt_file = "prompts/do/qa.md"
+prompt_file = "do/qa.md"
 depends_on = ["implement"]
 on_fail = "implement"
 max_retries = 3
