@@ -27,11 +27,11 @@ outputs:
 4. Identify files that need to be created or modified
 5. Design the implementation approach — consider edge cases and existing patterns
 6. Curate the precise context the worker agent needs — no more, no less
-7. **Action:** Post the structured XML context block (defined in the Output section) as a comment to the GitHub issue referenced in the Mission using the `gh` CLI.
+7. **Action:** Update the body of the GitHub issue to include the structured XML context block (defined in the Output section) referenced in the Mission using the `gh` CLI.
 
 ## Output
 
-Produce a structured XML context block for the worker agent and **post it to the GitHub issue**:
+Produce a structured XML context block for the worker agent and **update the GitHub issue body with it**:
 
 ```xml
 <task>
@@ -80,7 +80,7 @@ Produce a structured XML context block for the worker agent and **post it to the
 
 - **Tools:** Use the `gh` CLI to interact with GitHub.
 
-- Do NOT implement anything — only plan, curate context, and post the comment
+- Do NOT implement anything — only plan, curate context, and update the issue body
 - Be specific: reference exact file paths, function names, and line numbers
 - Consider backward compatibility and existing patterns
 - If the mission is ambiguous, state assumptions clearly

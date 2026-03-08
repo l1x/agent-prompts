@@ -23,7 +23,7 @@ outputs:
 
 ## Instructions
 
-1. Read the plan and context from prior steps
+1. Use the `gh` CLI (`gh issue view`) to read the implementation plan and XML context from the body of the GitHub issue referenced in the mission.
 2. Work in `{{worktree_path}}` and ensure you are on the deterministic mission branch (mission/issue-{number})
 3. Break the requested behavior into acceptance criteria
 4. For each acceptance criterion, run a TDD loop:
@@ -44,6 +44,8 @@ Return a summary of:
 - Final token usage and execution stats (if available)
 
 ## Constraints
+
+- **Tools:** Use the `gh` CLI to read the issue context.
 
 - Follow the plan; do not add features or refactor beyond what is specified
 - Prefer small RED/GREEN iterations over big-bang implementation
