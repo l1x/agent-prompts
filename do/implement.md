@@ -52,8 +52,8 @@ Return a summary of:
 - If a criterion cannot be expressed as an automated test, explain why and describe the best available verification
 - Keep commits atomic and well-described
 - If something in the plan is unclear, make a reasonable choice and document it
-- Do NOT push or create PRs
-- Stop after committing
+- **Action:** Push your branch and create a Pull Request using the `gh` CLI. Include a summary of your changes in the PR body.
+- Stop after creating the PR.
 
 ## Context from prior steps
 

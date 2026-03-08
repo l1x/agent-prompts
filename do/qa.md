@@ -41,7 +41,8 @@ outputs:
    - Use the project's test runner (for example: `mise run test`, `cargo test`, `bun test`)
    - Run linting and type checks if available
 5. Validate acceptance criteria coverage from the mission or linked issue
-6. If validation fails, report concrete gaps so the workflow can return to `implement`
+6. If validation fails, report concrete gaps so the workflow can return to `implement`.
+7. **Action:** Post your final verdict (PASS/FAIL) and a brief summary of the results as a comment to the GitHub issue referenced in the Mission using the `gh` CLI.
 
 ## Output
 
@@ -75,6 +76,8 @@ Your output MUST be valid JSON:
 `verdict` must be exactly `PASS` or `FAIL`. Use `FAIL` if any test/check fails or if critical acceptance criteria are not covered.
 
 ## Constraints
+
+- **Tools:** Use the `gh` CLI to post your verdict.
 
 - Use the existing test framework; do not introduce a new one
 - Match the project's test style and conventions exactly
