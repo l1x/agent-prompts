@@ -17,6 +17,8 @@ outputs: []
 
 ## Quality Gates
 
+**Environment:** If a `mise.toml` is present, prioritize `mise run <task>` over direct commands.
+
 Run these before committing, in order:
 
 1. `cargo fmt` — format all code

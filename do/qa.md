@@ -13,6 +13,13 @@ inputs:
 outputs:
   - name: report
     format: json
+    schema:
+      type: object
+      properties:
+        verdict: { type: string, enum: [PASS, FAIL] }
+        summary: { type: string }
+        test_run: { type: object, properties: { passed: { type: integer }, failed: { type: integer } } }
+      required: [verdict, summary, test_run]
 ```
 
 ## Mission
