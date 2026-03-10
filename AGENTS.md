@@ -52,7 +52,8 @@ agent-prompts/
 │   │   ├── qa.md                   # Write tests, run suite, verify coverage
 │   │   ├── architect.md            # System design, ADRs, Mermaid diagrams
 │   │   ├── security-review.md      # STRIDE threat model, JSON findings
-│   │   └── sre.md                  # Observe-Hypothesize-Verify-Fix diagnosis
+│   │   ├── sre.md                  # Observe-Hypothesize-Verify-Fix diagnosis
+│   │   └── formal.md               # Kani proof harnesses, TLA+ concurrency models
 │   ├── stacks/                     # Language/framework modifiers
 │   │   ├── rust.md                 # Rust idioms, clippy, cargo test
 │   │   ├── astro.md                # Astro/TypeScript, bun, CSS variables
